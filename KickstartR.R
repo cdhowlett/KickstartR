@@ -3,9 +3,22 @@
 if (!require(tidyverse)) install.packages('tidyverse')
 if (!require(caret)) install.packages('caret')
 if (!require(sentimentr)) install.packages('sentimentr')
+
+if (!require(randomForest)) install.packages('randomForest')
+if (!require(e1071)) install.packages('e1071')
+if (!require(Rborist)) install.packages('Rborist')
+if (!require(ranger)) install.packages('ranger')
+if (!require(nnet)) install.packages('nnet')
+
 library(sentimentr)
 library(tidyverse)
 library(caret)
+
+library(randomForest)
+library(e1071)
+library(Rborist)
+library(ranger)
+library(nnet)
 
 ks1 <- read_csv(unzip("kickstarter1.csv.zip"))
 ks2 <- read_csv(unzip("kickstarter2.csv.zip"))

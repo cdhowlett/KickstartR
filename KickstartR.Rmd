@@ -33,9 +33,22 @@ As set out above, the data was retreived from Kaggle and split into three files 
 if (!require(tidyverse)) install.packages('tidyverse')
 if (!require(caret)) install.packages('caret')
 if (!require(sentimentr)) install.packages('sentimentr')
+
+if (!require(randomForest)) install.packages('randomForest')
+if (!require(e1071)) install.packages('e1071')
+if (!require(Rborist)) install.packages('Rborist')
+if (!require(ranger)) install.packages('ranger')
+if (!require(nnet)) install.packages('nnet')
+
 library(sentimentr)
 library(tidyverse)
 library(caret)
+
+library(randomForest)
+library(e1071)
+library(Rborist)
+library(ranger)
+library(nnet)
 
 ks1 <- read_csv(unzip("kickstarter1.csv.zip"))
 ks2 <- read_csv(unzip("kickstarter2.csv.zip"))
@@ -69,7 +82,7 @@ removed <- anti_join(temp, validation)
 kstrain <- rbind(kstrain, removed)
 ```
 
-Once the data has been imported and a validation data set has been set aside, it is possible to examine the nature of the data available. In the training data `kstrain` there are 387843 Kickstarter projects'. The first project was in 2009 and the last in 2019.
+Once the data has been imported and a validation data set has been set aside, it is possible to examine the nature of the data available. In the training data `kstrain` there are 387843 Kickstarter projects. The first project was in 2009 and the last in 2019.
 
 ```{r cache=TRUE, message=FALSE}
 num_rows <- nrow(kstrain)
@@ -86,7 +99,7 @@ kstrain %>% group_by(year) %>% summarize(n=n()) %>%
   geom_bar(stat="identity")
 ```
 
-The variable to predict is the 'binary_state' - whether the project was successful in raising its crowdfunding, or if it failed.
+The variable this project set out to predict is the 'binary_state' - whether the project was successful in raising its crowdfunding, or if it failed.
 ```{r cache=TRUE, message=FALSE}
 possible_outcomes <- unique(kstrain$binary_state)
 ```
@@ -751,7 +764,7 @@ cm_lm <- confusionMatrix(factor(predictions),
 
 This produced an accuracy of 0.7324 - not too different from that acheived on the full training set.
 
-In light of this an attempt was undertaken to train a random forest on the smallest reduced training data set. On this occasion the Rborist algorithm as used in anticipation that it would be faster to train than the randomForest library.
+In light of this an attempt was undertaken to train a random forest on the smallest reduced training data set. On this occasion the Rborist algorithm was used in anticipation that it would be faster to train than the randomForest library.
 ```{r eval=FALSE, cache=TRUE, message=FALSE, warning=FALSE}
 fitrbo <- train(binary_state ~ b_y + b_m + b_d + b_co + 
                   b_cat + b_g + b_bl + b_dd,
@@ -946,7 +959,7 @@ knitr::kable(
 
 Ranger was the top performing model, and GLM, QDA, Rborist and KNN were unable to outperform linear regression.
 
-So to finally validate the Ranger model, it's accuracy needed to be assessed on the validation set.
+So to finally validate the Ranger model, its accuracy needed to be assessed on the validation set.
 
 First the regularized bias terms need to be added to the validation data:
 ```{r eval=FALSE, cache=TRUE, message=FALSE, warning=FALSE}
@@ -970,14 +983,14 @@ cm_ra_v <- confusionMatrix(
   )
 ```
 
-Testing against this validation data delivers a final accuracy of **0.7427**.
+Testing against this validation data delivered a final accuracy of **0.7427**.
 
 # Conclusion
 
-In this paper we discussed the application of various machine learning models to the task of predicting the outcome of Kickstarter projects over 10 years, from 2009 to 2019. The predictive quality of a variety of variables was examined, and models ranging from linear regression, through knn, random forest and neural networks were trained on the data. Using data only knowable at the outset of each project a prediction accuracy of 74.3% was acheived. While not that impressive in machine learning terms, it is nevertheless remarkable that before any possible backers have seen a project, it's likelihood of success is already set and discernible from data supplied when it is first posted to the Kickstarter website.
+In this paper we discussed the application of various machine learning models to the task of predicting the outcome of Kickstarter projects over 10 years, from 2009 to 2019. The predictive quality of a variety of variables was examined, and models ranging from linear regression, through knn, random forest and neural networks were trained on the data. Using data only knowable at the outset of each project a prediction accuracy of 74.3% was acheived. While not that impressive in machine learning terms, it is nevertheless remarkable that before any possible backers have seen a project, its likelihood of success is already set and discernible from data supplied when it is first posted to the Kickstarter website.
 
 Due to the challenges of dealing with a large volume of data and assessing a wide variety of algorithms, relatively little attention was given to tuning each algorithm precisely. It therefore seems likely that improved results could be obtained by more careful tuning.
 
-It may also be the case, that forecasting other variables such as the number of backers or whether the project will be picked as a Staff Pick may yield even stronger results. Finally, it is noted that even a week after a project's launch much more would be known about the project's popularity, so it may be that a model built to give forecasts throughout the lifecycle of a project could deliver much more accurate forecasts even shortly after a project has been launched. All of these possible approaches would seem to be fruitful avenues of future research.
+It may also be the case, that forecasting other variables such as the number of backers or whether the project will be picked as a Staff Pick, as preliminaries to forecasting success itself, may yield even stronger results. Finally, it is noted that even a week after a project's launch much more would be known about the project's popularity, so it may be that a model built to give forecasts throughout the lifecycle of a project could deliver much more accurate forecasts even shortly after a project has been launched. All of these possible approaches would seem to be fruitful avenues of future research.
 
 
